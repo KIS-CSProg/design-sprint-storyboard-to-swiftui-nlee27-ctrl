@@ -1,0 +1,88 @@
+import SwiftUI
+
+// MARK: - Main View
+// In SwiftUI, a "View" is a struct that describes what appears on screen.
+// Unlike UIKit's UIViewController (a class), SwiftUI views are lightweight value types.
+struct ContentView: View {
+    
+    // MARK: - Data
+    // 'let' creates a constant — this list never changes during the app's lifetime.
+    let elementList = ["Carbon", "Gold", "Chlorine", "Sodium"]
+    
+    // MARK: - State Properties
+    // @State tells SwiftUI: "watch this value — when it changes, redraw the UI automatically."
+    // This replaces the manual updateElement() function we needed in UIKit.
+    // 'private' means only this view can modify these values.
+    @State private var currentElementIndex = 0
+    @State private var answerText = "?"
+    
+    // MARK: - Body
+    // 'body' is the heart of every SwiftUI view.
+    // It describes WHAT the UI should look like, not HOW to build it step-by-step.
+    // This is called "declarative" UI (vs UIKit's "imperative" approach).
+    var body: some View {
+        
+        // VStack arranges children vertically (like a vertical UIStackView).
+        // 'spacing: 20' adds 20 points of space between each child.
+        VStack(spacing: 24) {
+            
+            // MARK: Element Image
+            // Image(name) loads from Assets.xcassets — same as UIImage(named:) in UIKit.
+            // Modifiers (.resizable, .scaledToFit, .frame) are chained to style the view.
+            // Each modifier returns a NEW view, so order matters!
+            Image(elementList[currentElementIndex])
+                .resizable()                          // Allow the image to be resized
+                .scaledToFit()                        // Keep aspect ratio (like .scaleAspectFit)
+                .frame(maxWidth: 300, maxHeight: 300) // Constrain the size
+                .padding()
+            
+            // MARK: Answer Label
+            // Text is SwiftUI's equivalent of UILabel.
+            // When 'answerText' changes (via @State), this Text updates automatically.
+            Text(answerText)
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.blue)
+            
+            // HStack arranges children horizontally.
+            HStack(spacing: 16) {
+                
+                // MARK: Show Answer Button
+                // Buttons take a closure ({ ... }) that runs when tapped.
+                // This replaces @IBAction methods from UIKit.
+                Button(action: {
+                    // Reveal the current element's name.
+                    answerText = elementList[currentElementIndex]
+                }) {
+                    Text("Show Answer")
+                        .frame(minWidth: 120)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                
+                // MARK: Next Button
+                Button(action: {
+                    // The modulo operator (%) wraps the index back to 0
+                    // when we reach the end of the list.
+                    currentElementIndex = (currentElementIndex + 1) % elementList.count
+                    
+                    // Reset the answer for the new element.
+                    answerText = "?"
+                }) {
+                    Text("Next")
+                        .frame(minWidth: 120)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+            }
+        }
+        .padding()
+    }
+}
+
+// MARK: - Preview
+// #Preview lets you see your UI in Xcode WITHOUT running the simulator.
+// This is one of SwiftUI's biggest advantages over Storyboards!
+#Preview {
+    ContentView()
+}
